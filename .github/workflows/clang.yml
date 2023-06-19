@@ -51,7 +51,7 @@ jobs:
         ninja -j$(nproc)
         sudo ninja install/strip
         cd /usr/local/llvm/
-        sudo tar cjf clang.tar.xz ./*
+        sudo tar cJf clang.tar.xz ./*
         cd $GITHUB_WORKSPACE
         touch release.txt
         echo "clang" >> release.txt
