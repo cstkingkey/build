@@ -34,7 +34,7 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install llvm-12-tools lld-12 rename
+        sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
         which lld-12
         which clang-12
         which llvm-strip-12
@@ -45,9 +45,11 @@ jobs:
         ls -la ./rootfs/
         cd $GITHUB_WORKSPACE
         ls -lah
-        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture arm64 && \
-        apt-get update && \
-        apt-get install --assume-yes --no-install-recommends libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
+        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture arm64
+        sudo chroot  --userspec=root:root .rootfs/ chmod 777 /tmp
+        sudo chroot  --userspec=root:root ./rootfs/ apt-get update
+        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
+        sudo rename.ul -s '/lib/' '../../../lib/' libz.so rootfs/usr/lib/aarch64-linux-gnu/*
         rm -rf rootfs.tar.xz
         tar cjf rootfs.tar.xz ./rootfs/
         touch release.txt
