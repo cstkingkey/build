@@ -1,0 +1,73 @@
+name: Build rootfs
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization environment
+      id: build
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install llvm-12-tools lld-12 rename
+        which lld-12
+        which clang-12
+        which llvm-strip
+        which llvm-strip-12
+        wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
+        tar xf rootfs.tar.xz -C /opt/
+        ls -la /opt/rootfs/
+        cd $GITHUB_WORKSPACE
+        ls -lah
+        chroot /opt/rootfs/
+        dpkg --add-architecture arm64 && \
+        apt-get update && \
+        apt-get install --assume-yes --no-install-recommends libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
+        exit
+        rm -rf rootfs.tar.xz
+        tar cjf rootfs.tar.xz /opt/rootfs/
+        touch release.txt
+        echo "rootfs" >> release.txt
+        echo "ROOTFS=$PWD/rootfs.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=status::success"
+        
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.build.outputs.release_tag }}
+        body_path: release.txt
+        files: |
+          ${{ env.ROOTFS }}
+
+    
