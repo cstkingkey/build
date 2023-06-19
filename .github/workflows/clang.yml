@@ -42,21 +42,20 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
-        echo "::set-output name=release_tag::clang-$(REPO_BRANCH)-$(date +"%Y.%m.%d-%H%M")"
+        sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux ninja-build cmake
+        echo "::set-output name=release_tag::clang-$REPO_BRANCH-$(date +"%Y.%m.%d-%H%M")"
         git clone  --depth 1 $REPO_URL -b $REPO_BRANCH llvm
         cd llvm
-        cmake -S llvm -B build -G Ninja -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_C_COMPILER="clang" -DLLVM_USE_LINKER=lld  -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld' -DCMAKE_C_FLAGS="-DNDEBUG" -DCMAKE_CXX_FLAGS="-DNDEBUG" -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON -DLLVM_ENABLE_LIBCXX:BOOL=ON
+        cmake -S llvm -B build -G Ninja -DCMAKE_INSTALL_PREFIX="/usr/local/llvm/"  -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld' -DCMAKE_C_FLAGS="-DNDEBUG" -DCMAKE_CXX_FLAGS="-DNDEBUG" -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON -DLLVM_ENABLE_LIBCXX:BOOL=ON
         cd build
-        ninja build -j$(nproc)
+        ninja -j$(nproc)
         sudo ninja install/strip
-        cd /usr/local/
+        cd /usr/local/llvm/
         sudo tar cjf clang.tar.xz ./*
         cd $GITHUB_WORKSPACE
         touch release.txt
         echo "clang" >> release.txt
-        echo "ROOTFS=/usr/local/clang.tar.xz" >> $GITHUB_ENV
-        
+        echo "ROOTFS=/usr/local/llvm/clang.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
         
     - name: Upload firmware to release
