@@ -52,7 +52,7 @@ jobs:
         #ignore errors using || true 
         sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/aarch64-linux-gnu/*  || true
         sudo rm -rf rootfs.tar.xz
-        sudo tar cjf rootfs.tar.xz ./rootfs/
+        sudo tar cJf rootfs.tar.xz ./rootfs/
         touch release.txt
         echo "rootfs" >> release.txt
         echo "ROOTFS=$PWD/rootfs.tar.xz" >> $GITHUB_ENV
