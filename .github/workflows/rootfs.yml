@@ -41,11 +41,11 @@ jobs:
         which clang-12
         which llvm-strip-12
         wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
-        tar xf rootfs.tar.xz -C /opt/
-        ls -la /opt/rootfs/
+        tar xf rootfs.tar.xz
+        ls -la ./rootfs/
         cd $GITHUB_WORKSPACE
         ls -lah
-        chroot /opt/rootfs/
+        chroot ./rootfs/
         dpkg --add-architecture arm64 && \
         apt-get update && \
         apt-get install --assume-yes --no-install-recommends libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
