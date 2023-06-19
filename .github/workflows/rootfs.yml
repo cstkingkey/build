@@ -40,7 +40,7 @@ jobs:
         which llvm-strip-12
         wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
         mkdir rootfs
-        tar xf rootfs.tar.xz -C ./rootfs/
+        sudo tar xf rootfs.tar.xz -C ./rootfs/
         ls -la .
         ls -la ./rootfs/
         cd $GITHUB_WORKSPACE
