@@ -1,0 +1,41 @@
+name: Build OpenWrt
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq llvm-12-tools lld-12
+        wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
+        tar xf rootfs.tar.xt -C /opt/
+        ls -la /opt/rootfs/
