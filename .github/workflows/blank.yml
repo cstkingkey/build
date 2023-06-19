@@ -35,7 +35,9 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq llvm-12-tools lld-12
+        sudo -E apt-get -qq install llvm-12-tools lld-12 rename
         wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
         tar xf rootfs.tar.xt -C /opt/
         ls -la /opt/rootfs/
+        cd $GITHUB_WORKSPACE
+        ls -lah
