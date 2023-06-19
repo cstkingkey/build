@@ -47,7 +47,7 @@ jobs:
         ls -la ./rootfs/
         cd $GITHUB_WORKSPACE
         ls -lah
-        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture arm64 && \
+        sudo -i chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture arm64 && \
         apt-get update && \
         apt-get install --assume-yes --no-install-recommends libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
         exit
