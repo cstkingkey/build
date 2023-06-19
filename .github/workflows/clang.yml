@@ -1,0 +1,66 @@
+name: Build clang
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/llvm/llvm-project.git
+  REPO_BRANCH: release/16.x
+  
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Initialization environment
+      id: build
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
+        echo "::set-output name=release_tag::clang-$(REPO_BRANCH)-$(date +"%Y.%m.%d-%H%M")"
+        git clone  --depth 1 $REPO_URL -b $REPO_BRANCH llvm
+        cd llvm
+        cmake -S llvm -B build -G Ninja -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_C_COMPILER="clang" -DLLVM_USE_LINKER=lld  -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld' -DCMAKE_C_FLAGS="-DNDEBUG" -DCMAKE_CXX_FLAGS="-DNDEBUG" -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON -DLLVM_ENABLE_LIBCXX:BOOL=ON
+        cd build
+        ninja build -j$(nproc)
+        sudo ninja install/strip
+        cd /usr/local/
+        sudo tar cjf clang.tar.xz ./*
+        cd $GITHUB_WORKSPACE
+        touch release.txt
+        echo "clang" >> release.txt
+        echo "ROOTFS=/usr/local/clang.tar.xz" >> $GITHUB_ENV
+        
+        echo "::set-output name=status::success"
+        
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.build.outputs.release_tag }}
+        body_path: release.txt
+        files: |
+          ${{ env.ROOTFS }}
+
+    
