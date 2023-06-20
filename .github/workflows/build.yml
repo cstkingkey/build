@@ -43,13 +43,13 @@ jobs:
         rustup target add aarch64-unknown-linux-gnu
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
-        ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release || true
+        ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release
         tar cJf fltk.tar.xz target/aarch64-unknown-linux-gnu/release/examples
         touch release.txt
         echo "fltk" >> release.txt
         echo "ROOTFS=$PWD/fltk.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=release_tag::fltk-$(date +"%Y.%m.%d-%H%M")"
-        echo "::set-output name=status::success1"
+        echo "::set-output name=status::success"
     
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
