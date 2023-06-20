@@ -45,15 +45,11 @@ jobs:
         sudo -E apt-get -qq update
         wget $ROOTFS_URL
         wget $CLANG_URL
-        sudo tar xf rootfs.tar.xz
+        sudo tar xf rootfs.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
         ls -la .
-        ls -la ./rootfs/
+        ls -la /opt/rootfs/
         ls -lah /usr/local/bin/
-        #ignore errors using || true 
-        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/aarch64-linux-gnu/*  || true
-        sudo rm -rf rootfs.tar.xz
-        sudo tar cJf rootfs.tar.xz ./rootfs/
         touch release.txt
         echo "rootfs" >> release.txt
         echo "ROOTFS=$PWD/rootfs.tar.xz" >> $GITHUB_ENV
