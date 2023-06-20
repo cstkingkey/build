@@ -1,0 +1,74 @@
+name: Build
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.20-1011/rootfs.tar.xz
+  CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
+  
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        
+    - name: Initialization environment
+      id: build
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        wget $ROOTFS_URL
+        wget $CLANG_URL
+        sudo tar xf rootfs.tar.xz
+        sudo tar xf clang.tar.xz -C /usr/local/
+        ls -la .
+        ls -la ./rootfs/
+        ls -lah /usr/local/bin/
+        #ignore errors using || true 
+        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/aarch64-linux-gnu/*  || true
+        sudo rm -rf rootfs.tar.xz
+        sudo tar cJf rootfs.tar.xz ./rootfs/
+        touch release.txt
+        echo "rootfs" >> release.txt
+        echo "ROOTFS=$PWD/rootfs.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=status::success1"
+        
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.build.outputs.release_tag }}
+        body_path: release.txt
+        files: |
+          ${{ env.ROOTFS }}
+
+    
