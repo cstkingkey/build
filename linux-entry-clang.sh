@@ -4,7 +4,7 @@ set -e
 
 export CROSS_TOOLCHAIN_ROOT=/opt/cross-tools
 export CROSS_TARGET_ROOT=/opt/rootfs
-root="`dirname ${BASH_SOURCE[0]}`/../.."
+root="`dirname ${BASH_SOURCE[0]}`"
 root="`readlink -f $root`"
 declare -x LOCAL_TOOLCHAIN_ROOT=${root}/toolchain
 export PATH=${LOCAL_TOOLCHAIN_ROOT}/bin:${PATH}:${CROSS_TOOLCHAIN_ROOT}/bin
@@ -13,6 +13,8 @@ export PKG_CONFIG_ALLOW_CROSS=1
 
 declare -x CROSS_TARGET=${ARCH}-unknown-linux-gnu
 declare -x CROSS_TARGET2=${ARCH}-linux-gnu
+
+declare -x CFLTK_TOOLCHAIN="${root}/cross.cmake"
 
 export LLVM_VERSION=$(compgen -c | grep -E clang-[0-9]+ | sed 's/clang-//' | sort -rn | head -n 1)
 
