@@ -45,6 +45,7 @@ jobs:
         cd fltk-rs
         ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release
         tar cJf fltk.tar.xz target/aarch64-unknown-linux-gnu/release/examples
+        cd $GITHUB_WORKSPACE
         touch release.txt
         echo "fltk" >> release.txt
         echo "ROOTFS=$PWD/fltk.tar.xz" >> $GITHUB_ENV
