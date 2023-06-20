@@ -32,7 +32,7 @@ jobs:
       uses: actions/checkout@main
         
     - name: Initialization environment
-      id: build
+      id: env
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
@@ -41,17 +41,8 @@ jobs:
         sudo tar xf rootfs.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
         rustup target add aarch64-unknown-linux-gnu
-        git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
-        cd fltk-rs
-        ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release
-        tar cJf fltk.tar.xz target/aarch64-unknown-linux-gnu/release/examples
-        cd $GITHUB_WORKSPACE
-        touch release.txt
-        echo "fltk" >> release.txt
-        echo "ROOTFS=$PWD/fltk.tar.xz" >> $GITHUB_ENV
-        echo "::set-output name=release_tag::fltk-$(date +"%Y.%m.%d-%H%M")"
         echo "::set-output name=status::success"
-    
+
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
@@ -59,9 +50,29 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
-    - name: Upload firmware to release
-      uses: softprops/action-gh-release@v1
+    - name: Build and package
+      id: build
+      if: steps.env.outputs.status == 'success' && !cancelled()
+      run: |
+        git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
+        cd fltk-rs
+        ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release
+        tar cJf fltk.tar.xz target/aarch64-unknown-linux-gnu/release/examples
+        echo "ROOTFS=$PWD/fltk.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Create tag
+      id: tag
       if: steps.build.outputs.status == 'success' && !cancelled()
+      run: |
+        touch release.txt
+        echo "fltk" >> release.txt
+        echo "::set-output name=release_tag::fltk-$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=status::success"
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
