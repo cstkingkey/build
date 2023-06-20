@@ -47,6 +47,7 @@ jobs:
         wget $CLANG_URL
         sudo tar xf rootfs.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
+        rustup target add aarch64-unknown-linux-gnu
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
         ARCH=aarch64 $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target aarch64-unknown-linux-gnu --examples --release
