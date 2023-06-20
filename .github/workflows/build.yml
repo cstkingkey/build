@@ -20,7 +20,7 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
-  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.20-1242/rootfs.tar.xz
+  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.20-1414/rootfs.tar.xz
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
   
 jobs:
