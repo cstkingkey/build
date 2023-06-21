@@ -67,7 +67,7 @@ jobs:
         cd fltk-rs
         arch=${{ matrix.arch }}
         ARCH=$arch $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target $arch-unknown-linux-gnu --examples --release
-        tar cJf fltk.tar.xz target/$arch-unknown-linux-gnu/release/examples
+        tar cJf fltk-$arch.tar.xz target/$arch-unknown-linux-gnu/release/examples
         echo "ROOTFS=$PWD/fltk-$arch.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
