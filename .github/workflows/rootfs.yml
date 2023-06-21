@@ -61,7 +61,7 @@ jobs:
         sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture $arch
         sudo chroot  --userspec=root:root ./rootfs/ chmod 777 /tmp
         sudo chroot  --userspec=root:root ./rootfs/ apt-get update
-        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
+        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libssl-dev:$arch libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
         #ignore errors using || true
         sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/*/*  || true
         sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/*/8/* || true
