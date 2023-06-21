@@ -49,7 +49,7 @@ jobs:
         sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
         sudo -E apt-get -qq install binfmt-support qemu qemu-user-static debootstrap
         arch=${{ matrix.arch }}
-        sudo debootstrap --arch=$arch --foreign buster rootfs
+        sudo debootstrap --arch=$arch --foreign --variant=minbase buster rootfs
         sudo cp /usr/bin/qemu-*-static ./rootfs/usr/bin
         sudo DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true chroot rootfs debootstrap/debootstrap --second-stage
         sudo chroot ./rootfs/ apt-get update
