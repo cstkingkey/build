@@ -20,7 +20,7 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
-  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.20-1414/rootfs.tar.xz
+  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.20-1414/
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
   
 jobs:
@@ -40,9 +40,10 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        wget $ROOTFS_URL
+        rootfs=$ROOTFS_URL/rootfs-${{ matrix.arch }}.tar.xz
+        wget $rootfs
         wget $CLANG_URL
-        sudo tar xf rootfs.tar.xz -C /opt/
+        sudo tar xf rootfs*.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
         rustup target add aarch64-unknown-linux-gnu
         echo "::set-output name=status::success"

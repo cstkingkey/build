@@ -60,16 +60,16 @@ jobs:
         sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture $arch
         sudo chroot  --userspec=root:root ./rootfs/ chmod 777 /tmp
         sudo chroot  --userspec=root:root ./rootfs/ apt-get update
-        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libgcc-8-dev:arm64 libstdc++-8-dev:arm64 libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
-        #ignore errors using || true 
-        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/aarch64-linux-gnu/*  || true
-        sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/aarch64-linux-gnu/8/* || true
+        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
+        #ignore errors using || true
+        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/*/*  || true
+        sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/*/8/* || true
         sudo rm -rf rootfs.tar.xz
-        sudo tar cJf rootfs.tar.xz ./rootfs/
+        sudo tar cJf rootfs-$arch.tar.xz ./rootfs/
         touch release.txt
         echo "rootfs" >> release.txt
-        echo "ROOTFS=$PWD/rootfs.tar.xz" >> $GITHUB_ENV
-        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d-%H%M")"
+        echo "ROOTFS=$PWD/rootfs-$arch.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d")"
         echo "::set-output name=status::success"
         
     - name: Upload firmware to release
