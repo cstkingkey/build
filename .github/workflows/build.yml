@@ -29,7 +29,11 @@ jobs:
 
     strategy:
       matrix:
-        arch: [aarch64, x86_64]
+        include:
+          - arch: aarch64
+            deb_arch: arm64
+          - name: x86_64
+            deb_arch: amd64
         
     steps:
     - name: Checkout
@@ -40,12 +44,12 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        rootfs=$ROOTFS_URL/rootfs-${{ matrix.arch }}.tar.xz
+        rootfs=$ROOTFS_URL/rootfs-${{ matrix.deb_arch }}.tar.xz
         wget $rootfs
         wget $CLANG_URL
         sudo tar xf rootfs*.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
-        rustup target add aarch64-unknown-linux-gnu
+        rustup target add ${{ matrix.arch }}-unknown-linux-gnu
         echo "::set-output name=status::success"
 
     - name: SSH connection to Actions
