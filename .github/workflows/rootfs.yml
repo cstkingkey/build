@@ -47,25 +47,16 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
-        which lld-12
-        which clang-12
-        which llvm-strip-12
-        wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
-        mkdir rootfs
-        sudo tar xf rootfs.tar.xz -C ./rootfs/
+        sudo -E apt-get -qq install binfmt-support qemu qemu-user-static debootstrap
         arch=${{ matrix.arch }}
-        ls -la .
-        ls -la ./rootfs/
-        cd $GITHUB_WORKSPACE
-        ls -lah
-        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture $arch
-        sudo chroot  --userspec=root:root ./rootfs/ chmod 777 /tmp
-        sudo chroot  --userspec=root:root ./rootfs/ apt-get update
-        sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libssl-dev:$arch libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
+        sudo debootstrap --arch=$arch --foreign buster rootfs
+        sudo cp /usr/bin/qemu-*-static ./rootfs/usr/bin
+        sudo DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true chroot rootfs debootstrap/debootstrap --second-stage
+        sudo chroot ./rootfs/ apt-get update
+        sudo chroot ./rootfs/ apt-get install --assume-yes --no-install-recommends libssl-dev:$arch libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
         #ignore errors using || true
         sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/*/*  || true
         sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/*/8/* || true
-        sudo rm -rf rootfs.tar.xz
         sudo tar cJf rootfs-$arch.tar.xz ./rootfs/
         touch release.txt
         echo "rootfs" >> release.txt
@@ -83,5 +74,3 @@ jobs:
         body_path: release.txt
         files: |
           ${{ env.ROOTFS }}
-
-    
