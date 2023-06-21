@@ -24,7 +24,11 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
-
+    
+    strategy:
+      matrix:
+        arch: [aarch64, x86_64]
+    
     steps:
     - name: Checkout
       uses: actions/checkout@main
@@ -48,11 +52,12 @@ jobs:
         wget https://github.com/debuerreotype/docker-debian-artifacts/raw/dist-amd64/buster/slim/rootfs.tar.xz
         mkdir rootfs
         sudo tar xf rootfs.tar.xz -C ./rootfs/
+        arch=${{ matrix.arch }}
         ls -la .
         ls -la ./rootfs/
         cd $GITHUB_WORKSPACE
         ls -lah
-        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture arm64
+        sudo chroot  --userspec=root:root ./rootfs/ dpkg --add-architecture $arch
         sudo chroot  --userspec=root:root ./rootfs/ chmod 777 /tmp
         sudo chroot  --userspec=root:root ./rootfs/ apt-get update
         sudo chroot  --userspec=root:root ./rootfs/ apt-get install --assume-yes --no-install-recommends libgcc-8-dev:arm64 libstdc++-8-dev:arm64 libx11-dev:arm64 libxext-dev:arm64 libxft-dev:arm64 libxinerama-dev:arm64 libxcursor-dev:arm64 libxrender-dev:arm64 libxfixes-dev:arm64 libpango1.0-dev:arm64 libgl1-mesa-dev:arm64 libglu1-mesa-dev:arm64
