@@ -60,7 +60,7 @@ jobs:
       run: |
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
-        arch = ${{ matrix.arch }}
+        arch=${{ matrix.arch }}
         ARCH=$arch $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target $arch-unknown-linux-gnu --examples --release
         tar cJf fltk.tar.xz target/$arch-unknown-linux-gnu/release/examples
         echo "ROOTFS=$PWD/fltk-$arch.tar.xz" >> $GITHUB_ENV
