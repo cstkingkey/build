@@ -18,17 +18,17 @@ else
    declare -x ARCH2=${ARCH}
 fi
 
+declare -x CROSS_TARGET=${ARCH}-unknown-linux-gnu${ABI}
+declare -x CROSS_TARGET2=${ARCH2}-linux-gnu${ABI}
+
 case ${ARCH} in
   x86_64|aarch64|i686|powerpc64le|arm)
       export REAL_LD=lld
       ;;
   *)
-      export REAL_LD=ld
+      export REAL_LD=${CROSS_TARGET2}-ld
       ;;
 esac
-
-declare -x CROSS_TARGET=${ARCH}-unknown-linux-gnu${ABI}
-declare -x CROSS_TARGET2=${ARCH2}-linux-gnu${ABI}
 
 declare -x CFLTK_TOOLCHAIN="${root}/cross.cmake"
 
