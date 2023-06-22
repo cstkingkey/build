@@ -88,8 +88,8 @@ jobs:
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
         ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target $arch-unknown-linux-gnu${abi} --examples --release
-        tar cJf fltk-$arch.tar.xz target/$arch-unknown-linux-gnu/release/examples
-        echo "ROOTFS=$PWD/fltk-$arch.tar.xz" >> $GITHUB_ENV
+        tar cJf fltk-$arch$abi.tar.xz target/$arch-unknown-linux-gnu${abi}/release/examples
+        echo "ROOTFS=$PWD/fltk-$arch$abi.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Create tag

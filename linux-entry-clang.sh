@@ -35,4 +35,7 @@ declare -x CARGO_TARGET_${upper_suffix}_LINKER=linux-clang
 declare -x PKG_CONFIG_SYSROOT_DIR=${CROSS_TARGET_ROOT}
 declare -x PKG_CONFIG_PATH="${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2}/pkgconfig/:${CROSS_TARGET_ROOT}/usr/share/pkgconfig/:${PKG_CONFIG_PATH}"
 
+declare -x CFLAGS_${envvar_suffix}="-fPIC"
+declare -x CXXFLAGS_${envvar_suffix}="-fPIC"
+
 exec "$@"
