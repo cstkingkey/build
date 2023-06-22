@@ -26,7 +26,7 @@ case ${ARCH} in
       export REAL_LD=lld
       ;;
   *)
-      export REAL_LD=${CROSS_TARGET2}-ld
+      export REAL_LD=/usr/bin/${CROSS_TARGET2}-ld
       ;;
 esac
 
