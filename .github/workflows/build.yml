@@ -34,7 +34,11 @@ jobs:
             deb_arch: arm64
           - arch: x86_64
             deb_arch: amd64
-        
+          - arch: i386
+            deb_arch: i386
+          - arch: powerpc64le
+            deb_arch: ppc64el
+
     steps:
     - name: Checkout
       uses: actions/checkout@main

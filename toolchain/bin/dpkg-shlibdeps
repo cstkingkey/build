@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -z ${D_IMAGE_NAME+x} ];
+then
+   echo "$@" > /tmp/args
+   filepath="$_"
+   filename=`basename ${filepath}`
+   echo $filename > /tmp/filename
+   cp $filepath /opt/rootfs/tmp/
+   chroot /opt/rootfs /usr/bin/dpkg-shlibdeps -O /tmp/${filename}
+   rm /opt/rootfs/tmp/$filename
+else
+   docker run --rm -i -v /tmp:/tmp -v /home/:/home/ -v /media/:/media/ --workdir "$(pwd)" my/cross:linux-${D_IMAGE_NAME} dpkg-shlibdeps "$@"
+fi
