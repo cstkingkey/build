@@ -39,21 +39,23 @@ jobs:
             deb_arch: i386
           - arch: powerpc64le
             deb_arch: ppc64el
-          - arch: mips64el
-            deb_arch: mips64el
-            abi: abi64
+          # lld issue https://github.com/llvm/llvm-project/issues/58377  
+          #- arch: mips64el
+          #  deb_arch: mips64el
+          #  abi: abi64
           - arch: arm
             deb_arch: armhf
             abi: eabihf
           - arch: arm
             deb_arch: armel
             abi: eabi
-          - arch: s390x
-            deb_arch: s390x
-          - arch: mipsel
-            deb_arch: mipsel
-          - arch: mips
-            deb_arch: mips
+          # lld issue https://github.com/llvm/llvm-project/issues/57097  
+          #- arch: s390x
+          #  deb_arch: s390x
+          # - arch: mipsel
+          #  deb_arch: mipsel
+          # - arch: mips
+          #  deb_arch: mips
 
     steps:
     - name: Checkout
