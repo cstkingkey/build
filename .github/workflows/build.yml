@@ -28,13 +28,14 @@ jobs:
     runs-on: ubuntu-20.04
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: aarch64
             deb_arch: arm64
           - arch: x86_64
             deb_arch: amd64
-          - arch: i386
+          - arch: i686
             deb_arch: i386
           - arch: powerpc64le
             deb_arch: ppc64el
