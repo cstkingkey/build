@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-clang -target ${CROSS_TARGET2} -fuse-ld=lld --sysroot=${CROSS_TARGET_ROOT} $@
+clang -target ${CROSS_TARGET2} -fuse-ld=${REAL_LD} --sysroot=${CROSS_TARGET_ROOT} $@
