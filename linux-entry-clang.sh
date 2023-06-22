@@ -11,8 +11,15 @@ export PATH=${LOCAL_TOOLCHAIN_ROOT}/bin:${PATH}:${CROSS_TOOLCHAIN_ROOT}/bin
 ## openssl-sys need it.
 export PKG_CONFIG_ALLOW_CROSS=1
 
+if [[ ${ARCH} == "i"*"86" ]]
+then
+   declare -x ARCH2="i386"
+else
+   declare -x ARCH2=${ARCH}
+fi
+
 declare -x CROSS_TARGET=${ARCH}-unknown-linux-gnu${ABI}
-declare -x CROSS_TARGET2=${ARCH}-linux-gnu${ABI}
+declare -x CROSS_TARGET2=${ARCH2}-linux-gnu${ABI}
 
 declare -x CFLTK_TOOLCHAIN="${root}/cross.cmake"
 
@@ -35,7 +42,7 @@ declare -x CARGO_TARGET_${upper_suffix}_LINKER=linux-clang
 declare -x PKG_CONFIG_SYSROOT_DIR=${CROSS_TARGET_ROOT}
 declare -x PKG_CONFIG_PATH="${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2}/pkgconfig/:${CROSS_TARGET_ROOT}/usr/share/pkgconfig/:${PKG_CONFIG_PATH}"
 
-declare -x CFLAGS_${envvar_suffix}="-fPIC"
-declare -x CXXFLAGS_${envvar_suffix}="-fPIC"
+#declare -x CFLAGS_${envvar_suffix}="-fPIC"
+#declare -x CXXFLAGS_${envvar_suffix}="-fPIC"
 
 exec "$@"
