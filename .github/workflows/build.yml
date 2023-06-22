@@ -42,6 +42,18 @@ jobs:
           - arch: mips64el
             deb_arch: mips64el
             abi: abi64
+          - arch: arm
+            deb_arch: armhf
+            abi: eabihf
+          - arch: arm
+            deb_arch: armel
+            abi: eabi
+          - arch: s390x
+            deb_arch: s390x
+          - arch: mipsel
+            deb_arch: mipsel
+          - arch: mips
+            deb_arch: mips
 
     steps:
     - name: Checkout
