@@ -27,4 +27,4 @@ case ${OS} in
       ;;
 esac
 
-$root/$REAL_ENTRY "$@"
+#$root/$REAL_ENTRY "$@"

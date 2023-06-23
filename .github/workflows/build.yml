@@ -91,8 +91,9 @@ jobs:
         os=${{ matrix.os }}
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
-        sudo OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL $GITHUB_WORKSPACE/entry.sh ./install_package.sh
-        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh rustup target add ${RUST_TARGET}
+        OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
+        sudo OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL ./install_package.sh
+        rustup target add ${RUST_TARGET}
         echo "::set-output name=status::success"
 
     - name: SSH connection to Actions
@@ -111,9 +112,10 @@ jobs:
         os=${{ matrix.os }}
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
-        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh cargo build --target ${RUST_TARGET} --examples --release
-        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
-        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
+        OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
+        OS=$os ARCH=$arch ABI=$abi $REAL_ENTRY cargo build --target ${RUST_TARGET} --examples --release
+        tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
+        echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Create tag
