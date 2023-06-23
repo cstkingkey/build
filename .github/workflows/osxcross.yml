@@ -72,7 +72,7 @@ jobs:
       if: steps.env.outputs.status == 'success' && !cancelled()
       run: |
         cd osxcross
-        UNATTENDED=1 TARGET_DIR=/usr/local/osxcross sudo ./build.sh
+        sudo UNATTENDED=1 TARGET_DIR=/usr/local/osxcross ./build.sh
         cd /usr/local/
         tar cJf osxcross.tar.xz osxcross
         echo "ROOTFS=$PWD/osxcross.tar.xz" >> $GITHUB_ENV

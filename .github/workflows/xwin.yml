@@ -64,7 +64,7 @@ jobs:
         arch=${{ matrix.arch }}
         cd xwin
         cargo install xwin --locked
-        cargo xwin --accept-license --arch $arch splat  --include-debug-libs
+        /home/runner/.cargo/bin/xwin --accept-license --arch $arch splat --include-debug-libs
         mv .xwin-cache/splat xwin
         tar cJF xwin-$arch.tar.xz xwin
         echo "ROOTFS=$PWD/xwin-$arch.tar.xz" >> $GITHUB_ENV
