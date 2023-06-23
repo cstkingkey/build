@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/usr/local/bin/lld-link /libpath:/opt/xwin/crt/lib/${ARCH2} /libpath:/opt/xwin/sdk/lib/um/${ARCH2} /libpath:/opt/xwin/sdk/lib/ucrt/${ARCH2} $@
