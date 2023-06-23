@@ -7,12 +7,12 @@ root="`readlink -f $root`"
 
 case ${OS} in
   linux)
-      export REAL_ENTRY=linux-entry-clang.sh
+      export REAL_ENTRY=$root/linux-entry-clang.sh
       export RUST_TARGET=$arch-unknown-linux-gnu${abi}
       export LINUX_TARGET=$arch-linux-gnu${abi}
       ;;
   win)
-      export REAL_ENTRY=xwin-entry.sh
+      export REAL_ENTRY=$root/xwin-entry.sh
       export RUST_TARGET=${ARCH}-pc-windows-msvc
       if [[ ${ARCH} == "i"*"86" ]]
       then
@@ -22,7 +22,7 @@ case ${OS} in
       fi
       ;;
   mac)
-      export REAL_ENTRY=darwin-entry.sh
+      export REAL_ENTRY=$root/darwin-entry.sh
       export RUST_TARGET=${ARCH}-apple-darwin
       ;;
 esac
