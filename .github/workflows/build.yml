@@ -92,7 +92,7 @@ jobs:
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
         OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
-        sudo OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL ./install_package.sh
+        sudo WIN_ARCH=$WIN_ARCH LINUX_TARGET=$LINUX_TARGET OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL ./install_package.sh
         rustup target add ${RUST_TARGET}
         echo "::set-output name=status::success"
 

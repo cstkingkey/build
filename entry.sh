@@ -16,10 +16,9 @@ case ${OS} in
       export RUST_TARGET=${ARCH}-pc-windows-msvc
       if [[ ${ARCH} == "i"*"86" ]]
       then
-        #delare -x is not working
          export WIN_ARCH="x86"
       else
-         export WIN_ARCH=${ARCH}
+         declare -x WIN_ARCH=${ARCH}
       fi
       ;;
   mac)
