@@ -22,7 +22,9 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
   ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.22
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
-  
+  OSXCROSS_URL: https://github.com/cstkingkey/build/releases/download/osxcross-2023.06.23/osxcross.tar.xz
+  XWIN_URL: https://github.com/cstkingkey/build/releases/download/xwin-2023.06.23
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -31,30 +33,50 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: aarch64
+          - os: mac
+            arch: aarch64
+          - os: mac
+            arch: x86_64
+          - os: win
+            arch: aarch64
+          - os: win
+            arch: i686
+          - os: win
+            arch: x86_64
+          - os: linux
+            arch: aarch64
             deb_arch: arm64
-          - arch: x86_64
+          - os: linux
+            arch: x86_64
             deb_arch: amd64
-          - arch: i686
+          - os: linux
+            arch: i686
             deb_arch: i386
-          - arch: powerpc64le
+          - os: linux
+            arch: powerpc64le
             deb_arch: ppc64el
           # lld issue https://github.com/llvm/llvm-project/issues/58377  
-          - arch: mips64el
+          - os: linux
+            arch: mips64el
             deb_arch: mips64el
             abi: abi64
-          - arch: arm
+          - os: linux
+            arch: arm
             deb_arch: armhf
             abi: eabihf
-          - arch: arm
+          - os: linux
+            arch: arm
             deb_arch: armel
             abi: eabi
           # lld issue https://github.com/llvm/llvm-project/issues/57097  
-          - arch: s390x
+          - os: linux
+            arch: s390x
             deb_arch: s390x
-          - arch: mipsel
+          - os: linux
+            arch: mipsel
             deb_arch: mipsel
-          - arch: mips
+          - os: linux
+            arch: mips
             deb_arch: mips
 
     steps:
@@ -66,14 +88,11 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        # may fail
-        sudo -E apt-get -qq install binutils-${{ matrix.arch }}-linux-gnu${{ matrix.abi }} || true
-        rootfs=$ROOTFS_URL/rootfs-${{ matrix.deb_arch }}.tar.xz
-        wget $rootfs
-        wget $CLANG_URL
-        sudo tar xf rootfs*.tar.xz -C /opt/
-        sudo tar xf clang.tar.xz -C /usr/local/
-        rustup target add ${{ matrix.arch }}-unknown-linux-gnu${{ matrix.abi }}
+        os=${{ matrix.os }}
+        arch=${{ matrix.arch }}
+        abi=${{ matrix.abi }}
+        sudo OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} $GITHUB_WORKSPACE/entry.sh ./install_package.sh
+        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh rustup target add ${RUST_TARGET}
         echo "::set-output name=status::success"
 
     - name: SSH connection to Actions
@@ -89,11 +108,12 @@ jobs:
       run: |
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
+        os=${{ matrix.os }}
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
-        ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/linux-entry-clang.sh cargo build --target $arch-unknown-linux-gnu${abi} --examples --release
-        tar cJf fltk-$arch$abi.tar.xz target/$arch-unknown-linux-gnu${abi}/release/examples
-        echo "ROOTFS=$PWD/fltk-$arch$abi.tar.xz" >> $GITHUB_ENV
+        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh cargo build --target ${RUST_TARGET} --examples --release
+        OS=$os ARCH=$arch ABI=$abi $GITHUB_WORKSPACE/entry.sh tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
+        echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Create tag
