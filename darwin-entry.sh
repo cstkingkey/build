@@ -5,7 +5,7 @@ set -e
 declare -x OSXCROSS_ROOT=/usr/local/osxcross
 declare -x CROSS_SYSROOT=${OSXCROSS_ROOT}/SDK/MacOSX13.1.sdk/usr/
 
-root="`dirname ${BASH_SOURCE[0]}`/../.."
+root="`dirname ${BASH_SOURCE[0]}`"
 ##root=`pwd`
 root="`readlink -f $root`"
 declare -x LOCAL_TOOLCHAIN_ROOT=${root}/toolchain

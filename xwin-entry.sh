@@ -4,7 +4,7 @@ set -e
 
 export CROSS_TOOLCHAIN_ROOT=/opt/cross-tools
 export CROSS_TARGET_ROOT=/opt/rootfs
-root="`dirname ${BASH_SOURCE[0]}`/../.."
+root="`dirname ${BASH_SOURCE[0]}`"
 ##root=`pwd`
 root="`readlink -f $root`"
 declare -x LOCAL_TOOLCHAIN_ROOT=${root}/toolchain
