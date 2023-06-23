@@ -76,7 +76,7 @@ jobs:
       run: |
         touch release.txt
         echo "xwin" >> release.txt
-        echo "::set-output name=release_tag::fltk-$(date +"%Y.%m.%d")"
+        echo "::set-output name=release_tag::xwin-$(date +"%Y.%m.%d")"
         echo "::set-output name=status::success"
 
     - name: Release
