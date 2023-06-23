@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
+# if error return imediately
+#set -e
 
 root="`dirname ${BASH_SOURCE[0]}`"
 root="`readlink -f $root`"

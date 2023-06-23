@@ -24,6 +24,7 @@ env:
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
   OSXCROSS_URL: https://github.com/cstkingkey/build/releases/download/osxcross-2023.06.23/osxcross.tar.xz
   XWIN_URL: https://github.com/cstkingkey/build/releases/download/xwin-2023.06.23
+  CMAKE_VERSION: 3.26.4
 
 jobs:
   build:
