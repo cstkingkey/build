@@ -1,4 +1,4 @@
-name: Build osxcross
+name: Build xwin
 
 on:
   repository_dispatch:
@@ -22,42 +22,32 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
   ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.22
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
-  MAC_SDK_URL: https://github.com/cstkingkey/MacOSX-SDK/releases/download/v1.0/
-  CMAKE_VERSION: 3.26.4
+  
 jobs:
   build:
     runs-on: ubuntu-20.04
 
     strategy:
       fail-fast: false
+      matrix:
+        arch: [x86, x86_64, aarch, aarch64]
 
     steps:
     - name: Checkout
       uses: actions/checkout@main
     
-    - name: Checkout osxcross
+    - name: Checkout xwin
       uses: actions/checkout@v3
       with:
-        repository: tpoechtrager/osxcross
-        path: osxcross
+        repository: Jake-Shadle/xwin
+        path: xwin
 
     - name: Initialization environment
       id: env
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install git patch python libssl-dev lzma-dev libxml2-dev liblzma5 bzip2 cpio libbz2-1.0 zlib1g-dev
-        wget $CLANG_URL
-        wget $MAC_SDK_URL/MacOSX13.1.sdk.tar.xz
-        sudo tar xf clang.tar.xz -C /usr/local/
-        mv MacOSX13.1.sdk.tar.xz osxcross/tarballs/
-        echo "::set-output name=status::success"
-
-    - name: Install cmake
-      id: env-cmake
-      run: |
-        curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
-        sudo cp -r cmake*/* /usr/local/
+        # may fail
         echo "::set-output name=status::success"
 
     - name: SSH connection to Actions
@@ -71,11 +61,13 @@ jobs:
       id: build
       if: steps.env.outputs.status == 'success' && !cancelled()
       run: |
-        cd osxcross
-        UNATTENDED=1 TARGET_DIR=/usr/local/osxcross sudo ./build.sh
-        cd /usr/local/
-        tar cJf osxcross.tar.xz osxcross
-        echo "ROOTFS=$PWD/osxcross.tar.xz" >> $GITHUB_ENV
+        arch=${{ matrix.arch }}
+        cd xwin
+        cargo install xwin --locked
+        cargo xwin --accept-license --arch $arch splat  --include-debug-libs
+        mv .xwin-cache/splat xwin
+        tar cJF xwin-$arch.tar.xz xwin
+        echo "ROOTFS=$PWD/xwin-$arch.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Create tag
@@ -83,8 +75,8 @@ jobs:
       if: steps.build.outputs.status == 'success' && !cancelled()
       run: |
         touch release.txt
-        echo "osxcross" >> release.txt
-        echo "::set-output name=release_tag::osxcross-$(date +"%Y.%m.%d")"
+        echo "xwin" >> release.txt
+        echo "::set-output name=release_tag::fltk-$(date +"%Y.%m.%d")"
         echo "::set-output name=status::success"
 
     - name: Release
