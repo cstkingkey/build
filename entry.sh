@@ -20,7 +20,6 @@ case ${OS} in
       else
          declare -x WIN_ARCH=${ARCH}
       fi
-fi
       ;;
   mac)
       export REAL_ENTRY=darwin-entry.sh
