@@ -1,4 +1,4 @@
-name: Build
+name: Build osxcross
 
 on:
   repository_dispatch:
