@@ -1,0 +1,100 @@
+name: Build
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+  ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.22
+  CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
+  MAC_SDK_URL: https://github.com/cstkingkey/MacOSX-SDK/releases/download/v1.0/
+  CMAKE_VERSION: 3.26.4
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+    
+    - name: Checkout tools repo
+      uses: actions/checkout@v3
+      with:
+        repository: tpoechtrager/osxcross
+        path: osxcross
+
+    - name: Initialization environment
+      id: env
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install git patch python libssl-dev lzma-dev libxml2-dev xz bzip2 cpio libbz2 zlib1g-dev
+        wget $CLANG_URL
+        wget $MAC_SDK_URL/MacOSX13.1.sdk.tar.xz
+        sudo tar xf clang.tar.xz -C /usr/local/
+        mv MacOSX13.1.sdk.tar.xz osxcross/tarballs/
+        echo "::set-output name=status::success"
+
+    - name: Install cmake
+      id: env-cmake
+      run: |
+        curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
+        sudo mv cmake*/* /usr/local/
+        echo "::set-output name=status::success"
+
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+    - name: Build and package
+      id: build
+      if: steps.env.outputs.status == 'success' && !cancelled()
+      run: |
+        cd osxcross
+        UNATTENDED=1 TARGET_DIR=/usr/local/osxcross sudo ./build.sh
+        cd /usr/local/
+        tar cJf osxcross.tar.xz osxcross
+        tar cJf fltk-$arch$abi.tar.xz target/$arch-unknown-linux-gnu${abi}/release/examples
+        echo "ROOTFS=$PWD/osxcross.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Create tag
+      id: tag
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      run: |
+        touch release.txt
+        echo "osxcross" >> release.txt
+        echo "::set-output name=release_tag::osxcross-$(date +"%Y.%m.%d")"
+        echo "::set-output name=status::success"
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
+        files: |
+          ${{ env.ROOTFS }}
