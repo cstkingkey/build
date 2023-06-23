@@ -74,7 +74,7 @@ jobs:
         cd osxcross
         sudo UNATTENDED=1 TARGET_DIR=/usr/local/osxcross ./build.sh
         cd /usr/local/
-        tar cJf osxcross.tar.xz osxcross
+        sudo tar cJf osxcross.tar.xz ./osxcross
         echo "ROOTFS=$PWD/osxcross.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
