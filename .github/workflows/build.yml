@@ -69,8 +69,8 @@ jobs:
         # may fail
         sudo -E apt-get -qq install binutils-${{ matrix.arch }}-linux-gnu${{ matrix.abi }} || true
         rootfs=$ROOTFS_URL/rootfs-${{ matrix.deb_arch }}.tar.xz
-        wget $rootfs
-        wget $CLANG_URL
+        curl -sSL $rootfs
+        curl -sSL $CLANG_URL
         sudo tar xf rootfs*.tar.xz -C /opt/
         sudo tar xf clang.tar.xz -C /usr/local/
         rustup target add ${{ matrix.arch }}-unknown-linux-gnu${{ matrix.abi }}

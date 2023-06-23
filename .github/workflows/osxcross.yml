@@ -47,8 +47,8 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install git patch python libssl-dev lzma-dev libxml2-dev liblzma5 bzip2 cpio libbz2-1.0 zlib1g-dev
-        wget $CLANG_URL
-        wget $MAC_SDK_URL/MacOSX13.1.sdk.tar.xz
+        curl -sSL $CLANG_URL
+        curl -sSL $MAC_SDK_URL/MacOSX13.1.sdk.tar.xz
         sudo tar xf clang.tar.xz -C /usr/local/
         mv MacOSX13.1.sdk.tar.xz osxcross/tarballs/
         echo "::set-output name=status::success"
