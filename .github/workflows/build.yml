@@ -82,7 +82,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@main
-        
+    
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
     - name: Initialization environment
       id: env
       run: |
@@ -95,13 +102,6 @@ jobs:
         sudo WIN_ARCH=$WIN_ARCH LINUX_TARGET=$LINUX_TARGET OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL ./install_package.sh
         rustup target add ${RUST_TARGET}
         echo "::set-output name=status::success"
-
-    - name: SSH connection to Actions
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Build and package
       id: build
