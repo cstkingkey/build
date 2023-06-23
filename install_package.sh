@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 wget $CLANG_URL
 tar xf clang.tar.xz -C /usr/local/
