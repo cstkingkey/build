@@ -66,7 +66,7 @@ jobs:
         cargo install xwin --locked
         /home/runner/.cargo/bin/xwin --accept-license --arch $arch splat --include-debug-libs
         mv .xwin-cache/splat xwin
-        sudo tar cJF xwin-$arch.tar.xz ./xwin
+        sudo tar cJf xwin-$arch.tar.xz ./xwin
         echo "ROOTFS=$PWD/xwin-$arch.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
