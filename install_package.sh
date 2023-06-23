@@ -13,6 +13,7 @@ case ${OS} in
       tar xf rootfs*.tar.xz -C /opt/
       ;;
   win)
+      apt-get -qq ninja-build
       xwin=$XWIN_URL/xwin-${WIN_ARCH}.tar.xz
       wget $xwin
       tar xf xwin*.tar.xz -C /opt/
