@@ -35,7 +35,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
     
-    - name: Checkout tools repo
+    - name: Checkout osxcross
       uses: actions/checkout@v3
       with:
         repository: tpoechtrager/osxcross
@@ -57,7 +57,7 @@ jobs:
       id: env-cmake
       run: |
         curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
-        sudo mv cmake*/* /usr/local/
+        sudo cp -r cmake*/* /usr/local/
         echo "::set-output name=status::success"
 
     - name: SSH connection to Actions
