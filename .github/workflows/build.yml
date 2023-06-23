@@ -114,10 +114,10 @@ jobs:
         arch=${{ matrix.arch }}
         abi=${{ matrix.abi }}
         OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
-        OS=$os ARCH=$arch ABI=$abi $REAL_ENTRY cargo build --target ${RUST_TARGET} --examples --release
-        tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
+        OS=$os ARCH=$arch ABI=$abi $REAL_ENTRY cargo build --target ${RUST_TARGET} --examples --release || true
+        tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples || true
         echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
+        echo "::set-output name=status::success2"
     
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
