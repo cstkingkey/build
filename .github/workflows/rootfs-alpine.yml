@@ -20,6 +20,7 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
+  ROOTFS_URL: https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.2-x86_64.tar.gz
 
 jobs:
   build:
@@ -28,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [arm64, amd64, i386, armhf, armel, s390x, ppc64el, mips64el, mipsel, mips]
+        arch: [aarch64, armhf, armv7, s390x, x86, x86_64]
     
     steps:
     - name: Checkout
@@ -47,7 +48,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
-        sudo -E apt-get -qq install binfmt-support qemu qemu-user-static debootstrap
+        sudo -E apt-get -qq install binfmt-support qemu qemu-user-static
         echo "::set-output name=status::success"
 
     - name: Build and package
@@ -55,16 +56,15 @@ jobs:
       if: steps.env.outputs.status == 'success' && !cancelled()
       run: |
         arch=${{ matrix.arch }}
-        sudo debootstrap --arch=$arch --foreign --variant=minbase buster rootfs
-        sudo cp /usr/bin/qemu-*-static ./rootfs/usr/bin
-        sudo DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true chroot rootfs debootstrap/debootstrap --second-stage
-        sudo chroot ./rootfs/ apt-get update
-        sudo chroot ./rootfs/ apt-get install --assume-yes --no-install-recommends dpkg-dev:$arch libssl-dev:$arch libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
-        #ignore errors using || true
-        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/*-linux-*/*  || true
-        sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/*/8/* || true
-        sudo tar cJf rootfs-$arch.tar.xz ./rootfs/
-        echo "ROOTFS=$PWD/rootfs-$arch.tar.xz" >> $GITHUB_ENV
+        curl -sSL $ROOTFS_URL -o rootfs.tar.gz
+        mkdir rootfs
+        sudo tar xf rootfs.tar.gz -C ./rootfs/
+        sudo mkdir -p rootfs/$arch/etc/apk/
+        sudo cp /etc/resolv.conf rootfs/etc/
+        sudo chroot rootfs /sbin/apk add -p $arch --initdb -U --arch $arch --allow-untrusted -X http://dl-cdn.alpinelinux.org/alpine/latest-stable/main/ -U pango-dev fontconfig-dev libxinerama-dev libxfixes-dev libxcursor-dev gcc g++
+        sudo mv rootfs alpine
+        sudo tar cJf rootfs-alpine-$arch.tar.xz alpine
+        echo "ROOTFS=$PWD/rootfs-alpine-$arch.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Create tag
@@ -72,8 +72,8 @@ jobs:
       if: steps.build.outputs.status == 'success' && !cancelled()
       run: |
         touch release.txt
-        echo "rootfs" >> release.txt
-        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d")"
+        echo "rootfs alpine" >> release.txt
+        echo "::set-output name=release_tag::rootfs-alpine-$(date +"%Y.%m.%d")"
         echo "::set-output name=status::success"
         
     - name: Upload firmware to release
