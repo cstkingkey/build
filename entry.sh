@@ -8,9 +8,22 @@ root="`readlink -f $root`"
 
 case ${OS} in
   linux)
-      export REAL_ENTRY=$root/linux-entry-clang.sh
-      export RUST_TARGET=$ARCH-unknown-linux-gnu${abi}
-      export LINUX_TARGET=$ARCH-linux-gnu${abi}
+      if [ -z ${STD+x} ];
+      then
+        declare -x STD="gnu"
+      fi
+
+      export RUST_TARGET=$ARCH-unknown-linux-${STD}${abi}
+      export LINUX_TARGET=$ARCH-linux-${STD}${abi}
+
+      case ${STD} in
+        gnu)
+          export REAL_ENTRY=$root/linux-entry-clang.sh
+          ;;
+        musl)
+          export REAL_ENTRY=$root/linux-musl-entry-clang.sh
+          ;;
+      esac
       ;;
   win)
       export REAL_ENTRY=$root/xwin-entry.sh
