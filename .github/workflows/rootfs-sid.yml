@@ -1,0 +1,88 @@
+name: Build rootfs
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+      clean:
+        description: 'Clean Cache'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - main
+    paths:
+      - 'open.config'
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm64, amd64, i386, armhf, armel, s390x, ppc64el, mips64el, mipsel, mips, riscv64]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        
+    - name: Initialization environment
+      id: env
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install llvm-12-tools lld-12 util-linux
+        sudo -E apt-get -qq install binfmt-support qemu qemu-user-static debootstrap
+        echo "::set-output name=status::success"
+
+    - name: Build and package
+      id: build
+      if: steps.env.outputs.status == 'success' && !cancelled()
+      run: |
+        arch=${{ matrix.arch }}
+        sudo debootstrap --arch=$arch --foreign --variant=minbase buster rootfs
+        sudo cp /usr/bin/qemu-*-static ./rootfs/usr/bin
+        sudo DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true chroot rootfs debootstrap/debootstrap --second-stage
+        sudo chroot ./rootfs/ apt-get update
+        sudo chroot ./rootfs/ apt-get install --assume-yes --no-install-recommends dpkg-dev:$arch libssl-dev:$arch libgcc-8-dev:$arch libstdc++-8-dev:$arch libx11-dev:$arch libxext-dev:$arch libxft-dev:$arch libxinerama-dev:$arch libxcursor-dev:$arch libxrender-dev:$arch libxfixes-dev:$arch libpango1.0-dev:$arch libgl1-mesa-dev:$arch libglu1-mesa-dev:$arch
+        #ignore errors using || true
+        sudo rename.ul -s '/lib/' '../../../lib/' rootfs/usr/lib/*-linux-*/*  || true
+        sudo rename.ul -s '/lib/' '../../../../../lib/' rootfs/usr/lib/gcc/*/8/* || true
+        sudo tar cJf rootfs-$arch.tar.xz ./rootfs/
+        echo "ROOTFS=$PWD/rootfs-$arch.tar.xz" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Create tag
+      id: tag
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      run: |
+        touch release.txt
+        echo "rootfs" >> release.txt
+        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d")"
+        echo "::set-output name=status::success"
+        
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
+        files: |
+          ${{ env.ROOTFS }}
