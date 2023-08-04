@@ -73,7 +73,7 @@ jobs:
       run: |
         touch release.txt
         echo "rootfs" >> release.txt
-        echo "::set-output name=release_tag::rootfs-$(date +"%Y.%m.%d")"
+        echo "::set-output name=release_tag::rootfs-sid-$(date +"%Y.%m.%d")"
         echo "::set-output name=status::success"
         
     - name: Upload firmware to release
