@@ -21,7 +21,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede.git
   ROOTFS_URL: https://github.com/cstkingkey/build/releases/download/rootfs-2023.06.22
-  CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.06.19-1706/clang.tar.xz
+  CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.08.06-0041/clang.tar.xz
   MAC_SDK_URL: https://github.com/cstkingkey/MacOSX-SDK/releases/download/v1.0/
   CMAKE_VERSION: 3.26.4
 jobs:
