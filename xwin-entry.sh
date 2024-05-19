@@ -36,4 +36,4 @@ declare -x CMAKE_MT=llvm-mt
 #declare -x CXXFLAGS_${envvar_suffix}="$CL_FLAGS"
 declare -x RUSTFLAGS="-Lnative=/opt/xwin/crt/lib/${ARCH2} -Lnative=/opt/xwin/sdk/lib/um/${ARCH2} -Lnative=/opt/xwin/sdk/lib/ucrt/${ARCH2}"
 
-#exec "$@"
+exec "$@"
