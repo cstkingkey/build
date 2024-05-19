@@ -30,4 +30,4 @@ declare -x CARGO_TARGET_${upper_suffix}_LINKER="${tools_prefix}"-clang
 declare -x CFLAGS_${envvar_suffix}="-stdlib=libc++ -fuse-ld=${OSXCROSS_ROOT}/bin/${tools_prefix}-ld"
 declare -x CXXFLAGS_${envvar_suffix}="-stdlib=libc++ -fuse-ld=${OSXCROSS_ROOT}/bin/${tools_prefix}-ld"
 
-exec "$@"
+#exec "$@"
