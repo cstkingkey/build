@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -x
 
 declare -x OSXCROSS_ROOT=/usr/local/osxcross
 declare -x CROSS_SYSROOT=${OSXCROSS_ROOT}/SDK/MacOSX13.1.sdk/usr/
