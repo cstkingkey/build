@@ -20,7 +20,7 @@ on:
 
 env:
   REPO_URL: https://github.com/llvm/llvm-project.git
-  REPO_BRANCH: release/16.x
+  REPO_BRANCH: release/17.x
   
 jobs:
   build:
