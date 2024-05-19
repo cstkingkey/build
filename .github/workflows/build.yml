@@ -93,10 +93,10 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        OS=${{ matrix.os }}
-        ARCH=${{ matrix.arch }}
-        ABI=${{ matrix.abi }}
-        deb_arch=${{ matrix.deb_arch }}
+        export OS=${{ matrix.os }}
+        export ARCH=${{ matrix.arch }}
+        export ABI=${{ matrix.abi }}
+        export deb_arch=${{ matrix.deb_arch }}
         ./entry.sh ./install_package.sh
         echo "::set-output name=status::success"
         
@@ -114,9 +114,9 @@ jobs:
       run: |
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
-        OS=${{ matrix.os }}
-        ARCH=${{ matrix.arch }}
-        ABI=${{ matrix.abi }}
+        export OS=${{ matrix.os }}
+        export ARCH=${{ matrix.arch }}
+        export ABI=${{ matrix.abi }}
         ./entry.sh ./build.sh
         tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
         echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
