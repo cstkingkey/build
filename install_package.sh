@@ -24,4 +24,11 @@ case ${OS} in
       ;;
 esac
 
-rustup target add ${RUST_TARGET}
+
+case ${ARCH} in
+  mips|mipsel|mips64el)
+      ;;
+  *)
+      rustup target add ${RUST_TARGET}
+      ;;
+esac
