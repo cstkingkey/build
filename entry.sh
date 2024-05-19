@@ -13,8 +13,8 @@ case ${OS} in
         declare -x STD="gnu"
       fi
 
-      export RUST_TARGET=$ARCH-unknown-linux-${STD}${abi}
-      export LINUX_TARGET=$ARCH-linux-${STD}${abi}
+      export RUST_TARGET=$ARCH-unknown-linux-${STD}${ABI}
+      export LINUX_TARGET=$ARCH-linux-${STD}${ABI}
 
       case ${STD} in
         gnu)
