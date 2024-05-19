@@ -27,6 +27,7 @@ esac
 
 case ${ARCH} in
   mips|mipsel|mips64el)
+      rustup toolchain install nightly
       ;;
   *)
       rustup target add ${RUST_TARGET}
