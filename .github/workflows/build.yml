@@ -28,7 +28,7 @@ env:
   CLANG_URL: https://github.com/cstkingkey/build/releases/download/clang-release%2F16.x-2023.08.06-0041/clang.tar.xz
   OSXCROSS_URL: https://github.com/cstkingkey/build/releases/download/osxcross-2023.06.23/osxcross.tar.xz
   XWIN_URL: https://github.com/cstkingkey/build/releases/download/xwin-2023.06.23
-  CMAKE_VERSION: 3.26.4
+  CMAKE_VERSION: 3.29.3
 
 jobs:
   build:
@@ -93,17 +93,16 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        os=${{ matrix.os }}
-        arch=${{ matrix.arch }}
-        abi=${{ matrix.abi }}
-        OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
-        sudo WIN_ARCH=$WIN_ARCH LINUX_TARGET=$LINUX_TARGET OS=$os ARCH=$arch ABI=$abi deb_arch=${{ matrix.deb_arch }} CLANG_URL=$CLANG_URL ROOTFS_URL=$ROOTFS_URL OSXCROSS_URL=$OSXCROSS_URL XWIN_URL=$XWIN_URL ./install_package.sh
-        rustup target add ${RUST_TARGET}
+        OS=${{ matrix.os }}
+        ARCH=${{ matrix.arch }}
+        ABI=${{ matrix.abi }}
+        deb_arch=${{ matrix.deb_arch }}
+        ./entry.sh ./install_package.sh
         echo "::set-output name=status::success"
         
     - name: Install cmake
       id: env-cmake
-      if: github.event.inputs.ssh == 'true' && !cancelled()
+      if: github.event.inputs.cmake == 'true' && !cancelled()
       run: |
         curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
         sudo cp -r cmake*/* /usr/local/
@@ -115,11 +114,10 @@ jobs:
       run: |
         git clone https://github.com/fltk-rs/fltk-rs --recurse-submodules
         cd fltk-rs
-        os=${{ matrix.os }}
-        arch=${{ matrix.arch }}
-        abi=${{ matrix.abi }}
-        OS=$os ARCH=$arch ABI=$abi source $GITHUB_WORKSPACE/entry.sh
-        OS=$os ARCH=$arch ABI=$abi $REAL_ENTRY cargo build --target ${RUST_TARGET} --examples --release
+        OS=${{ matrix.os }}
+        ARCH=${{ matrix.arch }}
+        ABI=${{ matrix.abi }}
+        ./entry.sh ./build.sh
         tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
         echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"

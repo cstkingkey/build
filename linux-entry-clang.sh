@@ -54,4 +54,4 @@ declare -x PKG_CONFIG_PATH="${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2}/pkgcon
 #declare -x CFLAGS_${envvar_suffix}="-fPIC"
 #declare -x CXXFLAGS_${envvar_suffix}="-fPIC"
 
-exec "$@"
+#exec "$@"
