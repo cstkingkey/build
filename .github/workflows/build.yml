@@ -117,6 +117,7 @@ jobs:
         export OS=${{ matrix.os }}
         export ARCH=${{ matrix.arch }}
         export ABI=${{ matrix.abi }}
+        . $GITHUB_WORKSPACE/entry.sh
         $GITHUB_WORKSPACE/entry.sh $GITHUB_WORKSPACE/build.sh
         tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
         echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
