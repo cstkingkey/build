@@ -97,7 +97,7 @@ jobs:
         export ARCH=${{ matrix.arch }}
         export ABI=${{ matrix.abi }}
         export deb_arch=${{ matrix.deb_arch }}
-        ./entry.sh ./install_package.sh
+        $GITHUB_WORKSPACE/entry.sh $GITHUB_WORKSPACE/install_package.sh
         echo "::set-output name=status::success"
         
     - name: Install cmake
@@ -117,7 +117,7 @@ jobs:
         export OS=${{ matrix.os }}
         export ARCH=${{ matrix.arch }}
         export ABI=${{ matrix.abi }}
-        ./entry.sh ./build.sh
+        $GITHUB_WORKSPACE/entry.sh $GITHUB_WORKSPACE/build.sh
         tar cJf fltk-${RUST_TARGET}.tar.xz target/${RUST_TARGET}/release/examples
         echo "ROOTFS=$PWD/fltk-${RUST_TARGET}.tar.xz" >> $GITHUB_ENV
         echo "::set-output name=status::success"
