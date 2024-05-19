@@ -12,6 +12,10 @@ on:
         description: 'Clean Cache'
         required: false
         default: 'false'
+      cmake:
+        description: 'use custom cmake'
+        required: false
+        default: 'false'
   push:
     branches:
       - main
@@ -99,6 +103,7 @@ jobs:
         
     - name: Install cmake
       id: env-cmake
+      if: github.event.inputs.ssh == 'true' && !cancelled()
       run: |
         curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
         sudo cp -r cmake*/* /usr/local/
