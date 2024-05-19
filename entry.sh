@@ -41,5 +41,4 @@ case ${OS} in
       ;;
 esac
 
-. $REAL_ENTRY
-exec "$@"
+#$REAL_ENTRY "$@"
