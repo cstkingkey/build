@@ -54,4 +54,12 @@ declare -x PKG_CONFIG_PATH="${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2}/pkgcon
 #declare -x CFLAGS_${envvar_suffix}="-fPIC"
 #declare -x CXXFLAGS_${envvar_suffix}="-fPIC"
 
+case ${ARCH} in
+  mips64el|loongarch64|s390x)
+      declare -x RUSTFLAGS="-Clink-args=-Wl,-rpath-link,${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2} -Clink-args=-Wl,-rpath-link,${CROSS_TARGET_ROOT}/lib/${CROSS_TARGET2} -Clink-args=-Wl,-rpath-link,${CROSS_TARGET_ROOT}/usr/lib64"
+      ;;
+  *)
+      ;;
+esac
+
 #exec "$@"

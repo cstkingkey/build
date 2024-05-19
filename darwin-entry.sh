@@ -15,7 +15,7 @@ declare -x CROSS_TARGET=${ARCH}-apple-darwin
 
 # extract our tools version. credit @0xdeafbeef.
 tools=$(compgen -c | grep "${CROSS_TARGET}")
-version=$(echo "${tools}" | grep 'ar$' |  sed 's/'"${CROSS_TARGET}"'//' | sed 's/-ar//')
+version=$(echo "${tools}" | grep 'ar$' |  sed 's/'"${CROSS_TARGET}"'//' | sed 's/-ar//' | head -n 1)
 
 # export our toolchain versions
 envvar_suffix="${CROSS_TARGET//-/_}"
