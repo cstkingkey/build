@@ -54,13 +54,6 @@ jobs:
         mv MacOSX13.1.sdk.tar.xz osxcross/tarballs/
         echo "::set-output name=status::success"
 
-    - name: Install cmake
-      id: env-cmake
-      run: |
-        curl -sSL https://cmake.org/files/LatestRelease/cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz | tar -xz
-        sudo cp -r cmake*/* /usr/local/
-        echo "::set-output name=status::success"
-
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
