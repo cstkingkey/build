@@ -4,6 +4,7 @@ set -e
 
 declare -x OSXCROSS_ROOT=/usr/local/osxcross
 declare -x CROSS_SYSROOT=${OSXCROSS_ROOT}/SDK/MacOSX13.1.sdk/usr/
+declare -x MACOSX_DEPLOYMENT_TARGET="10.9"
 
 root="`dirname ${BASH_SOURCE[0]}`"
 ##root=`pwd`
