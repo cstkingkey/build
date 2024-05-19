@@ -37,4 +37,4 @@ declare -x PKG_CONFIG_PATH="${CROSS_TARGET_ROOT}/usr/lib/${CROSS_TARGET2}/pkgcon
 declare -x CFLAGS_${envvar_suffix}="-target ${CROSS_TARGET2}"
 declare -x CXXFLAGS_${envvar_suffix}="-target ${CROSS_TARGET2} -isystem${CROSS_TARGET_ROOT}/usr/include/c++/12.2.1 -isystem${CROSS_TARGET_ROOT}/usr/include/c++/12.2.1/${CROSS_TARGET2}"
 
-exec "$@"
+# exec "$@"
