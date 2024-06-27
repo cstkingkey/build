@@ -46,7 +46,7 @@ jobs:
         echo "::set-output name=release_tag::clang-$REPO_BRANCH-$(date +"%Y.%m.%d-%H%M")"
         git clone  --depth 1 $REPO_URL -b $REPO_BRANCH llvm
         cd llvm
-        cmake -S llvm -B build -G Ninja -DCMAKE_INSTALL_PREFIX="/usr/local/llvm/"  -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld' -DCMAKE_C_FLAGS="-DNDEBUG" -DCMAKE_CXX_FLAGS="-DNDEBUG" -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON -DLLVM_ENABLE_LIBCXX:BOOL=ON
+        cmake -S llvm -B build -G Ninja -DCMAKE_INSTALL_PREFIX="/usr/local/llvm/"  -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld' -DCMAKE_C_FLAGS="-DNDEBUG" -DCMAKE_CXX_FLAGS="-DNDEBUG" -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_ENABLE_RUNTIMES="all" -DLLVM_ENABLE_LIBCXX:BOOL=ON
         cd build
         ninja -j$(nproc)
         sudo ninja install/strip
